@@ -1,0 +1,40 @@
+group 'itsok'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'ear'
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    // The following dependencies will be the ear modules and
+    // will be placed in the ear root
+    //deploy project(':war')
+
+    deploy project(':domain')
+    deploy project(':ejb')
+    deploy project(path: ':web', configuration: 'archives')
+
+    // The following dependencies will become ear libs and will
+    // be placed in a dir configured via the libDirName property
+    earlib group: 'log4j', name: 'log4j', version: '1.2.15', ext: 'jar'
+}
+
+
+ear {
+    deploymentDescriptor {
+        displayName = project.name
+        initializeInOrder = true
+        description = "My customized EAR for the Gradle documentation"
+        module("domain.jar", "java")
+        module("ejb.jar", "ejb")
+        webModule("ROOT.war", "/")
+//      module("my.jar", "java")  // won't deploy as my.jar isn't deploy dependency
+//      webModule("my.war", "/")  // won't deploy as my.war isn't deploy dependency
+    }
+}
+
+

@@ -1,0 +1,64 @@
+group 'itsok'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-cargo-plugin:2.2.1'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'war'
+apply plugin: 'com.bmuschko.cargo'
+apply plugin: 'idea'
+
+
+
+
+repositories {
+    mavenCentral()
+}
+
+war.archiveName "ROOT.war"
+
+dependencies {
+    compile project(':domain')
+    compile project(':ejb')
+    providedCompile "javax:javaee-api:7.0"
+    compile "org.codehaus.groovy:groovy-all:${gradle.groovyVersion}"
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    //cargo 'org.wildfly:wildfly-controller-client:8.2.1.Final'
+}
+
+cargo {
+    containerId = gradle.jeeContainer
+
+    local {
+        jvmArgs = '-Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n'
+        def windflyHome = System.env.WINDFLY_HOME
+        if (windflyHome) {
+            homeDir = file(windflyHome)
+        } else {
+            installer {
+                installUrl = 'http://download.jboss.org/wildfly/9.0.2.Final/wildfly-9.0.2.Final.zip'
+                downloadDir = file("$buildDir/download/$containerId")
+                extractDir = file("$containerId")
+            }
+        }
+    }
+}
+
+
+idea {
+    module {
+        excludeDirs = [file(gradle.jeeContainer)]
+    }
+}
+
+[cargoRunLocal, cargoRedeployLocal,
+ cargoStartLocal, cargoDeployRemote]*.dependsOn assemble

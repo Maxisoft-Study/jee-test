@@ -1,0 +1,10 @@
+rootProject.name = 'jytravaille'
+
+gradle.ext.groovyVersion = '2.4.5'
+gradle.ext.jeeContainer = 'wildfly9x'
+
+include 'domain'
+include 'ear'
+include 'ejb'
+include 'web'
+
